@@ -4,108 +4,164 @@ import { Filters } from "./components/Filters";
 import { KPIs } from "./components/KPIs";
 import { DataTable } from "./components/DataTable";
 import { Charts } from "./components/Charts";
-import { loadMunicipiosData, RegistroTuristico } from "./data/municipios";
 import { MunicipioGallery } from "./components/MunicipioGallery";
-import { WordAnalysis } from "./components/WordAnalysis"; // 👈 nuevo componente
-import { BarChart3, Table, Type } from "lucide-react"; // 👈 agregamos ícono de texto para "words"
-import { Map } from "lucide-react"; // ícono para el mapa
-import { MapView } from "./components/MapView"; // importa el componente
-
-
-
+import { WordAnalysis } from "./components/WordAnalysis";
+import { BarChart3, Table, Type, Map } from "lucide-react";
+import { MapView } from "./components/MapView";
+import { loadMunicipiosDataPontevedra, RegistroTuristicoPontevedra } from "./data/pontevedra";
 
 function App() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [selectedSources, setSelectedSources] = useState<string[]>([]);
-  const [selectedMunicipios, setSelectedMunicipios] = useState<string[]>([]);
-  const [municipiosTolima, setMunicipiosTolima] = useState<RegistroTuristico[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");  // 'searchTerm' ahora está disponible aquí
+  const [municipiosTolima, setMunicipiosTolima] = useState<RegistroTuristicoPontevedra[]>([]);
   const [activeView, setActiveView] = useState<"tabla" | "graficas" | "words" | "mapa">("tabla");
 
-  // Cargar los datos desde Excel
+  // ======== FILTROS ========
+  const [selectedTipos, setSelectedTipos] = useState<string[]>([]);
+  const [selectedCaminos, setSelectedCaminos] = useState<string[]>([]);
+  const [calificacionRange, setCalificacionRange] = useState<[number, number]>([1, 5]);
+  const [opinionesRange, setOpinionesRange] = useState<[number, number]>([0, 2000]);
+
+  // Cargar datos XLSX
   useEffect(() => {
-    loadMunicipiosData().then(setMunicipiosTolima);
+    loadMunicipiosDataPontevedra().then(setMunicipiosTolima);
   }, []);
 
-  // === Datos para los filtros ===
-  const availableCategories = useMemo(
-    () => [...new Set(municipiosTolima.map((m) => m.categoría))].sort(),
+  // ======== HELPERS ========
+  const unique = (arr: string[]) => [...new Set(arr.filter(Boolean))].sort();
+  const splitByPipe = (s?: string) => (s ?? "").split("|").map((t) => t.trim()).filter(Boolean);
+  const toNumberSafe = (v: any) => {
+    if (v == null) return NaN;
+    const s = String(v).trim();
+    if (!s) return NaN;
+    const first = s.split("/")[0]; // "4,5/5"
+    const normalized = first.replace(/\./g, "").replace(/,/g, ".");
+    const n = Number(normalized);
+    return Number.isFinite(n) ? n : NaN;
+  };
+  const parseOpiniones = (v: any) => {
+    if (typeof v === "number") return v;
+    const m = String(v ?? "").match(/[\d.,]+/);
+    return m ? toNumberSafe(m[0]) : NaN;
+  };
+
+  // Extraer tipo (según columna disponible)
+  const getTipo = (r: any): string => r.tipo ?? "";
+
+  // ======== OPCIONES DISPONIBLES ========
+  const availableTipos = useMemo(
+    () => [...new Set((municipiosTolima as any[]).map(getTipo).filter(Boolean))].sort(),
     [municipiosTolima]
   );
 
-  const availableSources = useMemo(
-    () => [...new Set(municipiosTolima.map((m) => m.fuente))].sort(),
+  const availableCaminos = useMemo(
+    () =>
+      unique(
+        (municipiosTolima as any[]).flatMap(
+          (r) =>
+            (r.caminos_list as string[] | undefined) ?? 
+            splitByPipe(r.situacion_caminos_de_santiago)
+        )
+      ),
     [municipiosTolima]
   );
 
-  const availableMunicipios = useMemo(
-    () => [...new Set(municipiosTolima.map((m) => m.municipio))].sort(),
-    [municipiosTolima]
-  );
-
-  // === Filtros dinámicos ===
+  // ======== FILTRADO DE DATOS ========
   const filteredData = useMemo(() => {
-    return municipiosTolima.filter((registro) => {
+    const term = searchTerm.trim().toLowerCase();
+
+    return (municipiosTolima as any[]).filter((r) => {
+      // Búsqueda general
       const matchesSearch =
-        searchTerm === "" ||
-        Object.values(registro).some((value) =>
-          String(value).toLowerCase().includes(searchTerm.toLowerCase())
+        term === "" ||
+        Object.values(r).some((v) =>
+          String(v ?? "").toLowerCase().includes(term)
         );
 
-      const matchesCategory =
-        selectedCategories.length === 0 ||
-        selectedCategories.includes(registro.categoría);
+      // Tipo
+      const tipo = getTipo(r);
+      const matchesTipo =
+        selectedTipos.length === 0 || selectedTipos.includes(tipo);
 
-      const matchesSource =
-        selectedSources.length === 0 ||
-        selectedSources.includes(registro.fuente);
+      // Camino
+      const caminos =
+        (r.caminos_list as string[] | undefined) ?? 
+        splitByPipe(r.situacion_caminos_de_santiago);
+      const matchesCamino =
+        selectedCaminos.length === 0 ||
+        selectedCaminos.every((c) => caminos.includes(c));
 
-      const matchesMunicipio =
-        selectedMunicipios.length === 0 ||
-        selectedMunicipios.includes(registro.municipio);
+      // Calificación (1–5)
+      const califNum = Number.isFinite(r?.calificacion_num)
+        ? Number(r.calificacion_num)
+        : toNumberSafe(r?.calificacion);
+      const matchesCalificacion =
+        !Number.isFinite(califNum) ||
+        (califNum >= calificacionRange[0] &&
+          califNum <= calificacionRange[1]);
 
-      return matchesSearch && matchesCategory && matchesSource && matchesMunicipio;
+      // Opiniones (0–2000)
+      const opinNum = Number.isFinite(r?.opiniones_num)
+        ? Number(r.opiniones_num)
+        : parseOpiniones(r?.num_opiniones);
+      const matchesOpiniones =
+        !Number.isFinite(opinNum) ||
+        (opinNum >= opinionesRange[0] &&
+          opinNum <= opinionesRange[1]);
+
+      return (
+        matchesSearch &&
+        matchesTipo &&
+        matchesCamino &&
+        matchesCalificacion &&
+        matchesOpiniones
+      );
     });
-  }, [searchTerm, selectedCategories, selectedSources, selectedMunicipios, municipiosTolima]);
+  }, [
+    municipiosTolima,
+    searchTerm,
+    selectedTipos,
+    selectedCaminos,
+    calificacionRange,
+    opinionesRange,
+  ]);
 
-  // === KPIs ===
-  const uniqueCategories = useMemo(
-    () => new Set(filteredData.map((r) => r.categoría)).size,
+  // ======== KPIs ========
+  const uniqueTipos = useMemo(
+    () => new Set(filteredData.map((r: any) => getTipo(r))).size,
     [filteredData]
   );
-
-  const uniqueSources = useMemo(
-    () => new Set(filteredData.map((r) => r.fuente)).size,
-    [filteredData]
-  );
+  const totalRecords = filteredData.length;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-emerald-50/30">
       <Navbar />
 
+      {/* ======== FILTROS ======== */}
       <Filters
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
-        selectedCategories={selectedCategories}
-        onCategoriesChange={setSelectedCategories}
-        selectedSources={selectedSources}
-        onSourcesChange={setSelectedSources}
-        selectedMunicipios={selectedMunicipios}
-        onMunicipiosChange={setSelectedMunicipios}
-        availableCategories={availableCategories}
-        availableSources={availableSources}
-        availableMunicipios={availableMunicipios}
+        selectedTipos={selectedTipos}
+        onTiposChange={setSelectedTipos}
+        availableTipos={availableTipos}
+        selectedCaminos={selectedCaminos}
+        onCaminosChange={setSelectedCaminos}
+        availableCaminos={availableCaminos}
+        calificacionRange={calificacionRange}
+        onCalificacionRangeChange={setCalificacionRange}
+        opinionesRange={opinionesRange}
+        onOpinionesRangeChange={setOpinionesRange}
       />
 
+      {/* ======== KPIs ======== */}
       <KPIs
-        totalRecords={filteredData.length}
-        uniqueCategories={uniqueCategories}
-        uniqueSources={uniqueSources}
+        totalRecords={totalRecords}
+        uniqueCategories={uniqueTipos}
+        uniqueSources={availableCaminos.length}
       />
 
-      <MunicipioGallery selectedMunicipios={selectedMunicipios} />
+      <MunicipioGallery selectedMunicipios={[]} />
 
-      {/* === Navegador de vistas === */}
+      {/* ======== NAV DE VISTAS ======== */}
       <div className="flex justify-center mt-6 mb-4">
         <div className="flex bg-white/80 backdrop-blur-md border border-gray-200 rounded-full shadow-sm overflow-hidden">
           <button
@@ -155,18 +211,13 @@ function App() {
         </div>
       </div>
 
-      {/* === Contenido dinámico === */}
+      {/* ======== CONTENIDO DINÁMICO ======== */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-10">
-        {activeView === "tabla" && <DataTable data={filteredData} />}
-        {activeView === "graficas" && <Charts data={filteredData} />}
-        {activeView === "words" && <WordAnalysis data={filteredData} />}
-        {activeView === "mapa" && <MapView data={filteredData} />}
-
+        {activeView === "tabla" && <DataTable data={filteredData as any[]} />}
+        {activeView === "graficas" && <Charts data={filteredData as any[]} />}
+        {activeView === "words" && <WordAnalysis data={filteredData as any[]} />}
+        {activeView === "mapa" && <MapView data={filteredData as any[]} selectedTipos={selectedTipos} selectedCaminos={selectedCaminos} calificacionRange={calificacionRange} opinionesRange={opinionesRange} searchTerm={searchTerm} />}
       </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-10">
-
-</div>
     </div>
   );
 }
