@@ -12,6 +12,8 @@ import { Map } from "lucide-react"; // ícono para el mapa
 import { MapView } from "./components/MapView"; // importa el componente
 
 
+
+
 function App() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -161,6 +163,10 @@ function App() {
         {activeView === "mapa" && <MapView data={filteredData} />}
 
       </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-10">
+
+</div>
     </div>
   );
 }

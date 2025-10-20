@@ -1,7 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
-import { MapContainer, TileLayer, GeoJSON, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import L from "leaflet";
 import { RegistroTuristico } from "../data/municipios";
 
 interface MapViewProps {
@@ -70,24 +69,9 @@ export function MapView({ data }: MapViewProps) {
     fillOpacity: 0.25, // ahora visible
   };
 
-  // Coordenadas manuales de municipios del Tolima
-  const coordsMunicipios: Record<string, [number, number]> = {
-    "ibagué": [4.4389, -75.2322],
-    "chaparral": [3.7231, -75.4831],
-    "ataco": [3.5800, -75.6350],
-    "natagaima": [3.6292, -75.0964],
-    "murillo": [4.8758, -75.1714],
-    "flandes": [4.2833, -74.8167],
-    "cajamarca": [4.4381, -75.4261],
-    "líbano": [4.9211, -75.0622],
-    "rioblanco": [3.4975, -75.6825],
-    "planadas": [3.1125, -75.6478],
-  };
 
-  const markerIcon = new L.Icon({
-    iconUrl: "https://cdn-icons-png.flaticon.com/512/854/854878.png",
-    iconSize: [25, 25],
-  });
+
+ 
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
