@@ -8,18 +8,21 @@ import { MunicipioGallery } from "./components/MunicipioGallery";
 import { WordAnalysis } from "./components/WordAnalysis";
 import { BarChart3, Table, Type, Map } from "lucide-react";
 import { MapView } from "./components/MapView";
+import { CardView } from "./components/CardView"; // Importamos el nuevo componente CardView
 import { loadMunicipiosDataPontevedra, RegistroTuristicoPontevedra } from "./data/pontevedra";
 
 function App() {
   const [searchTerm, setSearchTerm] = useState("");  // 'searchTerm' ahora está disponible aquí
   const [municipiosTolima, setMunicipiosTolima] = useState<RegistroTuristicoPontevedra[]>([]);
-  const [activeView, setActiveView] = useState<"tabla" | "graficas" | "words" | "mapa">("tabla");
+  const [activeView, setActiveView] = useState<"informacion" | "graficas" | "words" | "mapa">("informacion");
 
   // ======== FILTROS ========
   const [selectedTipos, setSelectedTipos] = useState<string[]>([]);
   const [selectedCaminos, setSelectedCaminos] = useState<string[]>([]);
   const [calificacionRange, setCalificacionRange] = useState<[number, number]>([1, 5]);
   const [opinionesRange, setOpinionesRange] = useState<[number, number]>([0, 2000]);
+
+  const [viewFormat, setViewFormat] = useState<"tabla" | "cards">("tabla");
 
   // Cargar datos XLSX
   useEffect(() => {
@@ -159,21 +162,19 @@ function App() {
         uniqueSources={availableCaminos.length}
       />
 
-      <MunicipioGallery selectedMunicipios={[]} />
-
-      {/* ======== NAV DE VISTAS ======== */}
+      {/* ======== Botones para cambiar entre vista Información y Gráficas ======== */}
       <div className="flex justify-center mt-6 mb-4">
         <div className="flex bg-white/80 backdrop-blur-md border border-gray-200 rounded-full shadow-sm overflow-hidden">
           <button
-            onClick={() => setActiveView("tabla")}
+            onClick={() => setActiveView("informacion")}
             className={`flex items-center gap-2 px-6 py-2 transition-all ${
-              activeView === "tabla"
+              activeView === "informacion"
                 ? "bg-emerald-500 text-white"
                 : "text-gray-600 hover:bg-gray-100"
             }`}
           >
             <Table className="w-4 h-4" />
-            Tabla
+            Información
           </button>
           <button
             onClick={() => setActiveView("graficas")}
@@ -213,7 +214,39 @@ function App() {
 
       {/* ======== CONTENIDO DINÁMICO ======== */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-10">
-        {activeView === "tabla" && <DataTable data={filteredData as any[]} />}
+        {activeView === "informacion" && (
+          <>
+            {/* VISTA DE INFORMACION - CAMBIO ENTRE TABLA Y CARDS */}
+            <div className="flex justify-center mb-4">
+              <div className="flex bg-white/80 backdrop-blur-md border border-gray-200 rounded-full shadow-sm overflow-hidden">
+                <button
+                  onClick={() => setViewFormat("tabla")}
+                  className={`flex items-center gap-2 px-6 py-2 transition-all ${
+                    viewFormat === "tabla"
+                      ? "bg-emerald-500 text-white"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  <Table className="w-4 h-4" />
+                  Ver como Tabla
+                </button>
+                <button
+                  onClick={() => setViewFormat("cards")}
+                  className={`flex items-center gap-2 px-6 py-2 transition-all ${
+                    viewFormat === "cards"
+                      ? "bg-emerald-500 text-white"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  <Type className="w-4 h-4" />
+                  Ver como Cards
+                </button>
+              </div>
+            </div>
+            {viewFormat === "tabla" && <DataTable data={filteredData as any[]} />}
+            {viewFormat === "cards" && <CardView data={filteredData as any[]} />}
+          </>
+        )}
         {activeView === "graficas" && <Charts data={filteredData as any[]} />}
         {activeView === "words" && <WordAnalysis data={filteredData as any[]} />}
         {activeView === "mapa" && <MapView data={filteredData as any[]} selectedTipos={selectedTipos} selectedCaminos={selectedCaminos} calificacionRange={calificacionRange} opinionesRange={opinionesRange} searchTerm={searchTerm} />}
