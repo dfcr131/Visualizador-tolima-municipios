@@ -17,26 +17,18 @@ export function KPIs({ totalRecords, uniqueCategories, uniqueSources }: KPIsProp
       textColor: 'text-emerald-700'
     },
     {
-      label: 'Categorías',
+      label: 'Tipos',
       value: uniqueCategories,
       icon: Tag,
       color: 'from-blue-400 to-cyan-500',
       bgColor: 'bg-blue-50',
       textColor: 'text-blue-700'
     },
-    {
-      label: 'Fuentes',
-      value: uniqueSources,
-      icon: Database,
-      color: 'from-purple-400 to-pink-500',
-      bgColor: 'bg-purple-50',
-      textColor: 'text-purple-700'
-    }
   ];
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6"> {/* Cambié de grid-cols-3 a sm:grid-cols-2 */}
         {kpis.map((kpi) => {
           const Icon = kpi.icon;
           return (
