@@ -69,17 +69,18 @@ export function DataTable({ data }: DataTableProps) {
             <table className="w-full border-collapse bg-white/95 backdrop-blur-sm table-auto">
               <thead>
                 <tr className="bg-emerald-600 text-white text-sm">
-                  <th className="px-4 py-3 text-left font-semibold whitespace-nowrap w-[16%]">Nombre</th>
-                  <th className="px-4 py-3 text-left font-semibold whitespace-nowrap w-[24%]">Descripción</th>
-                  <th className="px-4 py-3 text-left font-semibold whitespace-nowrap w-[14%]">Caminos</th>
-                  <th className="px-4 py-3 text-left font-semibold whitespace-nowrap w-[18%]">Características</th>
-                  <th className="px-4 py-3 text-left font-semibold whitespace-nowrap w-[8%]">Calificación</th>
-                  <th className="px-4 py-3 text-left font-semibold whitespace-nowrap w-[8%]">Opiniones</th>
-                  <th className="px-4 py-3 text-left font-semibold whitespace-nowrap w-[12%]">Conectividad</th>
+                  <th className="px-4 py-3 text-left font-semibold whitespace-nowrap w-[12%]">Nombre</th>
+                  <th className="px-4 py-3 text-left font-semibold whitespace-nowrap w-[20%]">Descripción</th>
+                  <th className="px-4 py-3 text-left font-semibold whitespace-nowrap w-[12%]">Caminos</th>
+                  <th className="px-4 py-3 text-left font-semibold whitespace-nowrap w-[14%]">Características</th>
+                  <th className="px-4 py-3 text-left font-semibold whitespace-nowrap w-[7%]">Calificación</th>
+                  <th className="px-4 py-3 text-left font-semibold whitespace-nowrap w-[7%]">Opiniones</th>
+                  <th className="px-4 py-3 text-left font-semibold whitespace-nowrap w-[10%]">Conectividad</th>
                   <th className="px-4 py-3 text-left font-semibold whitespace-nowrap w-[12%]">Redes</th>
-                  <th className="px-4 py-3 text-left font-semibold whitespace-nowrap w-[10%]">Ubicación</th>
+                  <th className="px-4 py-3 text-left font-semibold whitespace-nowrap w-[6%]">Ubicación</th>
                 </tr>
               </thead>
+
 
               <tbody className="divide-y divide-gray-100 bg-white">
                 {data.map((r, idx) => {
@@ -205,16 +206,17 @@ export function DataTable({ data }: DataTableProps) {
                       </td>
 
                       {/* Redes */}
-                      <td className="px-4 py-3 text-sm text-gray-900">
+                      <td className="px-4 py-3 text-xs text-gray-900 align-top">
                         <div className="flex flex-col gap-1">
-                          <div>
-                            <span className="text-xs text-gray-500 mr-1">FB:</span>
+                          <div className="flex items-center gap-1">
+                            <span className="text-gray-500">FB:</span>
                             {hasFb ? (
                               <a
                                 href={r.facebook_urls}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="text-emerald-700 hover:text-emerald-900 underline break-all"
+                                className="text-emerald-700 hover:text-emerald-900 underline truncate max-w-[120px] inline-block"
+                                title={r.facebook_urls}
                               >
                                 Ver
                               </a>
@@ -222,14 +224,15 @@ export function DataTable({ data }: DataTableProps) {
                               <span className="text-gray-400">—</span>
                             )}
                           </div>
-                          <div>
-                            <span className="text-xs text-gray-500 mr-1">IG:</span>
+                          <div className="flex items-center gap-1">
+                            <span className="text-gray-500">IG:</span>
                             {hasIg ? (
                               <a
                                 href={r.instagram_urls}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="text-emerald-700 hover:text-emerald-900 underline break-all"
+                                className="text-emerald-700 hover:text-emerald-900 underline truncate max-w-[120px] inline-block"
+                                title={r.instagram_urls}
                               >
                                 Ver
                               </a>

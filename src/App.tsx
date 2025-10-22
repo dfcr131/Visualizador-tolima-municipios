@@ -161,6 +161,14 @@ function App() {
         uniqueCategories={uniqueTipos}
         uniqueSources={availableCaminos.length}
       />
+      {/* Imagen institucional */}
+      <div className="flex justify-center my-8">
+        <img
+          src="..\public\images\logo 5-04.jpg"
+          alt="Logos institucionales - Xunta de Galicia, Gobierno de España, Unión Europea, Concello de Pontevedra"
+          className="max-w-[900px] w-full object-contain opacity-90"
+        />
+      </div>
 
       {/* ======== Botones para cambiar entre vista Información y Gráficas ======== */}
       <div className="flex justify-center mt-6 mb-4">

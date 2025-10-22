@@ -1,98 +1,186 @@
+import { useState } from "react";
 import { RegistroTuristicoPontevedra } from "../data/pontevedra";
 
+// Componente para truncar texto
+function TruncatedText({ text, maxLength = 200 }: { text: string; maxLength?: number }) {
+  const [expanded, setExpanded] = useState(false);
+  if (!text) return null;
+
+  const isTruncated = text.length > maxLength;
+  const displayText = expanded ? text : text.slice(0, maxLength) + (isTruncated ? "…" : "");
+
+  return (
+    <p className="text-sm text-gray-700 whitespace-pre-line leading-relaxed">
+      {displayText}
+      {isTruncated && (
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="ml-2 text-emerald-600 hover:text-emerald-800 font-medium text-xs underline"
+        >
+          {expanded ? "Leer menos" : "Leer más"}
+        </button>
+      )}
+    </p>
+  );
+}
+
+// Funciones auxiliares
+const splitByComma = (s?: string) => (s ?? "").split(",").map(t => t.trim()).filter(Boolean);
+const splitByPipe = (s?: string) => (s ?? "").split("|").map(t => t.trim()).filter(Boolean);
+
+const toNumberSafe = (v: any): number => {
+  if (v == null) return NaN;
+  const s = String(v).trim();
+  if (!s) return NaN;
+  const first = s.split("/")[0]; // Maneja "9,7/10"
+  const normalized = first.replace(/\./g, "").replace(/,/g, ".");
+  const n = Number(normalized);
+  return Number.isFinite(n) ? n : NaN;
+};
+
+const parseOpiniones = (v: any): number => {
+  if (typeof v === "number") return v;
+  const m = String(v ?? "").match(/[\d.,]+/);
+  return m ? toNumberSafe(m[0]) : NaN;
+};
+
+// Función para obtener imagen por tipo
+const getDefaultImage = (tipo: string) => {
+  switch (tipo.toLowerCase()) {
+    case "cafetería / café bar":
+      return "/images/default-cafe.jpg";
+    case "restaurante":
+      return "/images/default-restaurante.jpg";
+    case "espacio natural / recreativo":
+      return "/images/default-espacio-natural.jpg";
+    case "alojamiento":
+      return "/images/default-alojamiento.jpg";
+    case "hotel":
+      return "/images/default-hotel.jpg";
+    case "actividades turísticas / deportivas":
+      return "/images/default-actividades.jpg";
+    case "apartamento turístico":
+      return "/images/default-apartamento.jpg";
+    case "área de autocaravanas":
+      return "/images/default-autocaravanas.jpg";
+    case "agencia de viajes":
+      return "/images/default-agencia.jpg";
+    case "patrimonio arquitectónico":
+      return "/images/default-patrimonio.jpg";
+    case "lugar religioso":
+      return "/images/default-lugar-religioso.jpg";
+    case "comercio":
+      return "/images/default-comercio.jpg";
+    case "turismo rural":
+      return "/images/default-turismo-rural.jpg";
+    case "centro cultural / museo":
+      return "/images/default-cultura.jpg";
+    case "instalación náutica":
+      return "/images/default-nautica.jpg";
+    case "mirador":
+      return "/images/default-mirador.jpg";
+    case "elemento histórico / artístico":
+      return "/images/default-historico.jpg";
+    case "zona de especial conservación":
+      return "/images/default-conservacion.jpg";
+    case "taller artesanal":
+      return "/images/default-taller.jpg";
+    case "cascadas":
+      return "/images/default-cascada.jpg";
+    case "evento turístico":
+      return "/images/default-evento.jpg";
+    case "administración pública":
+      return "/images/default-administracion.jpg";
+    case "punto de información turística":
+      return "/images/default-info.jpg";
+    case "centro de eventos":
+      return "/images/default-centro-eventos.jpg";
+    case "playa":
+      return "/images/default-playa.jpg";
+    case "transporte":
+      return "/images/default-transporte.jpg";
+    case "accidente geográfico":
+      return "/images/default-accidente.jpg";
+    case "paseo urbano":
+      return "/images/default-paseo-urbano.jpg";
+    case "otro atractivo turístico":
+      return "/images/default-otro.jpg";
+    default:
+      return "/images/default-placeholder.jpg";
+  }
+};
+
+// =======================
+// Componente principal
+// =======================
 export function CardView({ data }: { data: RegistroTuristicoPontevedra[] }) {
-  // Función para obtener la imagen por defecto dependiendo del tipo
-  const getDefaultImage = (tipo: string) => {
-    switch (tipo.toLowerCase()) {
-      case "cafetería / café bar":
-        return "/images/default-cafe.jpg";  // Imagen predeterminada para café/bar
-      case "restaurante":
-        return "/images/default-restaurante.jpg";  // Imagen predeterminada para restaurante
-      case "espacio natural / recreativo":
-        return "/images/default-espacio-natural.jpg";  // Imagen predeterminada para espacio natural
-      case "alojamiento":
-        return "/images/default-alojamiento.jpg";  // Imagen predeterminada para alojamiento
-      case "hotel":
-        return "/images/default-hotel.jpg";  // Imagen predeterminada para hotel
-      case "actividades turísticas / deportivas":
-        return "/images/default-actividades.jpg";  // Imagen predeterminada para actividades
-      case "apartamento turístico":
-        return "/images/default-apartamento.jpg";  // Imagen predeterminada para apartamento
-      case "área de autocaravanas":
-        return "/images/default-autocaravanas.jpg";  // Imagen predeterminada para autocaravanas
-      case "agencia de viajes":
-        return "/images/default-agencia.jpg";  // Imagen predeterminada para agencia de viajes
-      case "patrimonio arquitectónico":
-        return "/images/default-patrimonio.jpg";  // Imagen predeterminada para patrimonio
-      case "lugar religioso":
-        return "/images/default-lugar-religioso.jpg";  // Imagen predeterminada para lugar religioso
-      case "comercio":
-        return "/images/default-comercio.jpg";  // Imagen predeterminada para comercio
-      case "turismo rural":
-        return "/images/default-turismo-rural.jpg";  // Imagen predeterminada para turismo rural
-      case "centro cultural / museo":
-        return "/images/default-cultura.jpg";  // Imagen predeterminada para centro cultural
-      case "instalación náutica":
-        return "/images/default-nautica.jpg";  // Imagen predeterminada para instalación náutica
-      case "mirador":
-        return "/images/default-mirador.jpg";  // Imagen predeterminada para mirador
-      case "elemento histórico / artístico":
-        return "/images/default-historico.jpg";  // Imagen predeterminada para elemento histórico
-      case "zona de especial conservación":
-        return "/images/default-conservacion.jpg";  // Imagen predeterminada para zona de conservación
-      case "taller artesanal":
-        return "/images/default-taller.jpg";  // Imagen predeterminada para taller artesanal
-      case "cascadas":
-        return "/images/default-cascada.jpg";  // Imagen predeterminada para cascadas
-      case "evento turístico":
-        return "/images/default-evento.jpg";  // Imagen predeterminada para evento turístico
-      case "administración pública":
-        return "/images/default-administracion.jpg";  // Imagen predeterminada para administración pública
-      case "punto de información turística":
-        return "/images/default-info.jpg";  // Imagen predeterminada para punto de información
-      case "centro de eventos":
-        return "/images/default-centro-eventos.jpg";  // Imagen predeterminada para centro de eventos
-      case "playa":
-        return "/images/default-playa.jpg";  // Imagen predeterminada para playa
-      case "transporte":
-        return "/images/default-transporte.jpg";  // Imagen predeterminada para transporte
-      case "accidente geográfico":
-        return "/images/default-accidente.jpg";  // Imagen predeterminada para accidente geográfico
-      case "paseo urbano":
-        return "/images/default-paseo-urbano.jpg";  // Imagen predeterminada para paseo urbano
-      case "otro atractivo turístico":
-        return "/images/default-otro.jpg";  // Imagen predeterminada para otro atractivo turístico
-      default:
-        return "/images/default-placeholder.jpg";  // Imagen predeterminada genérica en caso de que no coincida el tipo
-    }
-  };
+  if (data.length === 0) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
+          <p className="text-gray-500 text-lg">No se encontraron registros con los filtros aplicados.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      {data.map((registro) => {
-        // Si no tiene imágenes en srcset_list, usar la imagen por defecto
+      {data.map((registro, idx) => {
+        const caminos = splitByPipe(registro.situacion_caminos_de_santiago);
+        const car = splitByComma(registro.caracteristicas);
+
+        // =============== Calificación segura ===============
+        let califNum: number = 0;
+        if (typeof registro.calificacion_num === "number") {
+          califNum = registro.calificacion_num;
+        } else {
+          califNum = toNumberSafe(registro.calificacion);
+        }
+        if (!Number.isFinite(califNum)) califNum = 0;
+
+        // =============== Opiniones seguras ===============
+        let opinNum: number = 0;
+        if (typeof registro.opiniones_num === "number") {
+          opinNum = registro.opiniones_num;
+        } else {
+          opinNum = parseOpiniones(registro.num_opiniones);
+        }
+        if (!Number.isFinite(opinNum)) opinNum = 0;
+
+        // Imagen predeterminada
         const imageSrc =
           registro.srcset_list && registro.srcset_list.length > 0
-            ? registro.srcset_list[0] // Mostrar la primera imagen del array
-            : getDefaultImage(registro.tipo); // Usar la imagen por defecto dependiendo del tipo
+            ? registro.srcset_list[0]
+            : getDefaultImage(registro.tipo);
 
         return (
-          <div key={registro.telefono} className="bg-white rounded-lg shadow-md overflow-hidden">
-            {/* Imagen de la tarjeta */}
+          <div key={idx} className="bg-white rounded-lg shadow-md overflow-hidden">
             <img
               src={imageSrc}
               alt={registro.nombre_normalizado}
               className="w-full h-40 object-cover"
             />
             <div className="p-4">
-              <h3 className="font-semibold text-lg">{registro.nombre_normalizado}</h3>
-              <p className="text-sm text-gray-600">{registro.tipo}</p>
-              <p className="text-sm text-gray-600">{registro.descripcion.slice(0, 100)}...</p>
+              <h3 className="font-semibold text-lg">{registro.nombre_normalizado || "—"}</h3>
+              <TruncatedText text={registro.descripcion || ""} maxLength={200} />
+
+              <div className="text-sm text-gray-600">
+                <strong>Caminos: </strong>
+                {caminos.length === 0 ? "—" : caminos.join(", ")}
+              </div>
+
+              <div className="text-sm text-gray-600">
+                <strong>Características: </strong>
+                {car.length === 0 ? "—" : car.slice(0, 3).join(", ")}
+                {car.length > 3 && ` +${car.length - 3}`}
+              </div>
+
               <div className="mt-2 text-sm text-gray-700">
-                <strong>Calificación:</strong> {registro.calificacion}
+                <strong>Calificación:</strong> {califNum !== 0 ? califNum.toFixed(1) : "—"}
               </div>
               <div className="text-sm text-gray-700">
-                <strong>Opiniones:</strong> {registro.num_opiniones}
+                <strong>Opiniones:</strong> {opinNum !== 0 ? Math.round(opinNum) : "—"}
               </div>
             </div>
           </div>

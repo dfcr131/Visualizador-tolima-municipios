@@ -215,21 +215,37 @@ function RangeSelector({
 export function Filters({
   searchTerm,
   onSearchChange,
-
   selectedTipos,
   onTiposChange,
   availableTipos,
-
   selectedCaminos,
   onCaminosChange,
   availableCaminos,
-
   calificacionRange,
   onCalificacionRangeChange,
-
   opinionesRange,
   onOpinionesRangeChange,
 }: FiltersProps) {
+  const [visible, setVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
+  // Detectar dirección del scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      // Oculta si bajamos, muestra si subimos
+      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        setVisible(false);
+      } else {
+        setVisible(true);
+      }
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [lastScrollY]);
+
   const hasActive =
     searchTerm.trim() !== "" ||
     selectedTipos.length > 0 ||
@@ -248,9 +264,13 @@ export function Filters({
   };
 
   return (
-    <div className="sticky top-0 z-50 bg-gradient-to-r from-white/95 via-blue-50/80 to-emerald-50/80 backdrop-blur-md shadow-md border-b border-gray-200">
+    <div
+      className={`sticky top-0 z-50 transition-transform duration-300 ${
+        visible ? "translate-y-0" : "-translate-y-full"
+      } bg-gradient-to-r from-white/95 via-blue-50/80 to-emerald-50/80 backdrop-blur-md shadow-md border-b border-gray-200`}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
           {/* Buscar */}
           <div className="bg-white/90 rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
             <label className="block text-sm font-medium text-gray-700 mb-2">Buscar</label>
@@ -288,7 +308,7 @@ export function Filters({
             />
           </div>
 
-          {/* Calificación (1–5) */}
+          {/* Calificación */}
           <div className="bg-white/90 rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
             <RangeSelector
               label="Calificación (1–5)"
@@ -301,7 +321,7 @@ export function Filters({
             />
           </div>
 
-          {/* Opiniones (0–2000) */}
+          {/* Opiniones */}
           <div className="bg-white/90 rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
             <RangeSelector
               label="Opiniones (0–2000)"
@@ -315,6 +335,7 @@ export function Filters({
           </div>
         </div>
 
+        {/* Etiquetas activas */}
         {hasActive && (
           <div className="mt-4 flex items-center justify-between">
             <div className="flex flex-wrap gap-2">
