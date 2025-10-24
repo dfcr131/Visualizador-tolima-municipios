@@ -201,7 +201,7 @@ const handleDownloadCSV = (all: boolean = false) => {
       {/* Imagen institucional */}
       <div className="flex justify-center my-8">
         <img
-          src="..\public\images\logo 5-04.jpg"
+          src="\public\images\logoPontevedra.jpg"
           alt="Logos institucionales - Xunta de Galicia, Gobierno de España, Unión Europea, Concello de Pontevedra"
           className="max-w-[900px] w-full object-contain opacity-90"
         />
