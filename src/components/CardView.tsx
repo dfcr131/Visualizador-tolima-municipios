@@ -130,7 +130,6 @@ export function CardView({ data }: { data: RegistroTuristicoPontevedra[] }) {
         const caminos = splitByPipe(registro.situacion_caminos_de_santiago);
         const car = splitByComma(registro.caracteristicas);
 
-        // =============== Calificación segura ===============
         let califNum: number = 0;
         if (typeof registro.calificacion_num === "number") {
           califNum = registro.calificacion_num;
@@ -139,7 +138,6 @@ export function CardView({ data }: { data: RegistroTuristicoPontevedra[] }) {
         }
         if (!Number.isFinite(califNum)) califNum = 0;
 
-        // =============== Opiniones seguras ===============
         let opinNum: number = 0;
         if (typeof registro.opiniones_num === "number") {
           opinNum = registro.opiniones_num;
@@ -148,39 +146,58 @@ export function CardView({ data }: { data: RegistroTuristicoPontevedra[] }) {
         }
         if (!Number.isFinite(opinNum)) opinNum = 0;
 
-        // Imagen predeterminada
         const imageSrc =
           registro.srcset_list && registro.srcset_list.length > 0
             ? registro.srcset_list[0]
             : getDefaultImage(registro.tipo);
 
         return (
-          <div key={idx} className="bg-white rounded-lg shadow-md overflow-hidden">
-            <img
-              src={imageSrc}
-              alt={registro.nombre_normalizado}
-              className="w-full h-40 object-cover"
-            />
-            <div className="p-4">
-              <h3 className="font-semibold text-lg">{registro.nombre_normalizado || "—"}</h3>
-              <TruncatedText text={registro.descripcion || ""} maxLength={200} />
+          <div
+            key={idx}
+            className="flex flex-col bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all duration-200"
+          >
+            <div className="h-40 w-full overflow-hidden">
+              <img
+                src={imageSrc}
+                alt={registro.nombre_normalizado}
+                className="w-full h-full object-cover"
+              />
+            </div>
 
-              <div className="text-sm text-gray-600">
-                <strong>Caminos: </strong>
-                {caminos.length === 0 ? "—" : caminos.join(", ")}
+            <div className="flex flex-col flex-grow p-4">
+              {/* Título */}
+              <h3 className="font-semibold text-lg mb-1 text-gray-900 line-clamp-2 min-h-[48px]">
+                {registro.nombre_normalizado || "—"}
+              </h3>
+
+              {/* Descripción truncada */}
+              <div className="flex-grow">
+                <TruncatedText text={registro.descripcion || ""} maxLength={180} />
               </div>
 
-              <div className="text-sm text-gray-600">
-                <strong>Características: </strong>
-                {car.length === 0 ? "—" : car.slice(0, 3).join(", ")}
-                {car.length > 3 && ` +${car.length - 3}`}
+              {/* Información adicional */}
+              <div className="mt-3 space-y-1 text-sm text-gray-700">
+                <div>
+                  <strong>Caminos: </strong>
+                  {caminos.length === 0 ? "—" : caminos.join(", ")}
+                </div>
+                <div>
+                  <strong>Características: </strong>
+                  {car.length === 0 ? "—" : car.slice(0, 3).join(", ")}
+                  {car.length > 3 && ` +${car.length - 3}`}
+                </div>
               </div>
 
-              <div className="mt-2 text-sm text-gray-700">
-                <strong>Calificación:</strong> {califNum !== 0 ? califNum.toFixed(1) : "—"}
-              </div>
-              <div className="text-sm text-gray-700">
-                <strong>Opiniones:</strong> {opinNum !== 0 ? Math.round(opinNum) : "—"}
+              {/* Calificación y opiniones */}
+              <div className="mt-4 flex justify-between text-sm text-gray-800 font-medium border-t border-gray-100 pt-2">
+                <div>
+                  <strong>⭐ Calificación:</strong>{" "}
+                  {califNum !== 0 ? califNum.toFixed(1) : "—"}
+                </div>
+                <div>
+                  <strong>💬 Opiniones:</strong>{" "}
+                  {opinNum !== 0 ? Math.round(opinNum) : "—"}
+                </div>
               </div>
             </div>
           </div>
@@ -189,3 +206,4 @@ export function CardView({ data }: { data: RegistroTuristicoPontevedra[] }) {
     </div>
   );
 }
+

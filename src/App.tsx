@@ -20,7 +20,7 @@ function App() {
   const [selectedTipos, setSelectedTipos] = useState<string[]>([]);
   const [selectedCaminos, setSelectedCaminos] = useState<string[]>([]);
   const [calificacionRange, setCalificacionRange] = useState<[number, number]>([1, 5]);
-  const [opinionesRange, setOpinionesRange] = useState<[number, number]>([0, 2000]);
+  const [opinionesRange, setOpinionesRange] = useState<[number, number]>([0, 2600]);
 
   const [viewFormat, setViewFormat] = useState<"tabla" | "cards">("tabla");
 
@@ -102,7 +102,7 @@ function App() {
         (califNum >= calificacionRange[0] &&
           califNum <= calificacionRange[1]);
 
-      // Opiniones (0–2000)
+      // Opiniones (0–2600)
       const opinNum = Number.isFinite(r?.opiniones_num)
         ? Number(r.opiniones_num)
         : parseOpiniones(r?.num_opiniones);
@@ -134,6 +134,43 @@ function App() {
     [filteredData]
   );
   const totalRecords = filteredData.length;
+
+const handleDownloadCSV = (all: boolean = false) => {
+  const dataToExport = all ? municipiosTolima : filteredData;
+
+  if (!dataToExport || dataToExport.length === 0) {
+    alert("No hay datos para descargar.");
+    return;
+  }
+
+  // Crear encabezados
+  const headers = Object.keys(dataToExport[0]);
+
+  // Formatear filas (escapando comas y saltos de línea)
+  const rows = dataToExport.map((row) =>
+    headers
+      .map((key) => {
+        const cell = row[key] ?? "";
+        const safe = String(cell).replace(/"/g, '""'); // escapamos comillas
+        return `"${safe}"`; // aseguramos formato CSV correcto
+      })
+      .join(",")
+  );
+
+  const csv = [headers.join(","), ...rows].join("\n");
+  const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = all
+    ? "datos_observatorio_completo.csv"
+    : "datos_observatorio_filtrado.csv";
+  link.click();
+  URL.revokeObjectURL(url);
+};
+
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-emerald-50/30">
@@ -224,35 +261,59 @@ function App() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-10">
         {activeView === "informacion" && (
           <>
-            {/* VISTA DE INFORMACION - CAMBIO ENTRE TABLA Y CARDS */}
-            <div className="flex justify-center mb-4">
-              <div className="flex bg-white/80 backdrop-blur-md border border-gray-200 rounded-full shadow-sm overflow-hidden">
-                <button
-                  onClick={() => setViewFormat("tabla")}
-                  className={`flex items-center gap-2 px-6 py-2 transition-all ${
-                    viewFormat === "tabla"
-                      ? "bg-emerald-500 text-white"
-                      : "text-gray-600 hover:bg-gray-100"
-                  }`}
-                >
-                  <Table className="w-4 h-4" />
-                  Ver como Tabla
-                </button>
-                <button
-                  onClick={() => setViewFormat("cards")}
-                  className={`flex items-center gap-2 px-6 py-2 transition-all ${
-                    viewFormat === "cards"
-                      ? "bg-emerald-500 text-white"
-                      : "text-gray-600 hover:bg-gray-100"
-                  }`}
-                >
-                  <Type className="w-4 h-4" />
-                  Ver como Cards
-                </button>
-              </div>
+            {/* === VISTA DE INFORMACIÓN - CAMBIO ENTRE TABLA Y CARDS + DESCARGA === */}
+          <div className="flex flex-wrap items-center justify-between bg-white/80 backdrop-blur-md border border-gray-200 rounded-2xl shadow-sm p-4 mt-6 mb-4">
+
+            {/* Controles de vista */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setViewFormat("tabla")}
+                className={`flex items-center gap-2 px-5 py-2 rounded-xl font-medium transition-all ${
+                  viewFormat === "tabla"
+                    ? "bg-emerald-500 text-white shadow-md"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                }`}
+              >
+                <Table className="w-4 h-4" />
+                Ver como Tabla
+              </button>
+
+              <button
+                onClick={() => setViewFormat("cards")}
+                className={`flex items-center gap-2 px-5 py-2 rounded-xl font-medium transition-all ${
+                  viewFormat === "cards"
+                    ? "bg-emerald-500 text-white shadow-md"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                }`}
+              >
+                <Type className="w-4 h-4" />
+                Ver como Cards
+              </button>
             </div>
-            {viewFormat === "tabla" && <DataTable data={filteredData as any[]} />}
-            {viewFormat === "cards" && <CardView data={filteredData as any[]} />}
+
+             {/* Menú de descarga */}
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => handleDownloadCSV(false)}
+                className="flex items-center gap-2 bg-gray-200 text-gray-800 px-5 py-2 rounded-xl shadow hover:bg-gray-300 transition-all"
+              >  
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5m0 0l5-5m-5 5V4" />
+                </svg>
+                Descargar datos (.csv)
+              </button>
+            </div>
+          </div>
+          {/* Renderizado condicional */}
+          {viewFormat === "tabla" && <DataTable data={filteredData as any[]} />}
+          {viewFormat === "cards" && <CardView data={filteredData as any[]} />}
+
           </>
         )}
         {activeView === "graficas" && <Charts data={filteredData as any[]} />}
