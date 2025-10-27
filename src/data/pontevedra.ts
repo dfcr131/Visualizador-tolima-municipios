@@ -58,10 +58,13 @@ function parseCalificacion(raw: any): number | null {
   return n ?? null;
 }
 function parseLatLon(raw: any): number {
-  const s = toStringSafe(raw);
-  const n = toNumberFromLocale(s);
-  return n ?? NaN;
+  if (raw == null) return NaN;
+  let s = raw.toString().trim();
+  s = s.replace(",", ".").replace(/\s+/g, "");
+  const n = parseFloat(s);
+  return Number.isFinite(n) ? n : NaN;
 }
+
 function splitList(raw: any): string[] {
   const s = toStringSafe(raw);
   if (!s) return [];
@@ -83,7 +86,7 @@ export async function loadMunicipiosDataPontevedra(): Promise<RegistroTuristicoP
   const worksheet = workbook.Sheets[sheetName];
   if (!worksheet) throw new Error(`No se encontró la hoja '${sheetName}' en pontevedra.xlsx`);
 
-  const rawData = XLSX.utils.sheet_to_json<any>(worksheet, { defval: "", raw: false });
+const rawData = XLSX.utils.sheet_to_json<any>(worksheet, { defval: "", raw: true });
 
   const data: RegistroTuristicoPontevedra[] = rawData.map((row) => {
     // columnas EXACTAS de tu Excel

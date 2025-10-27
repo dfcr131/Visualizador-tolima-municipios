@@ -20,7 +20,7 @@ function App() {
   const [selectedTipos, setSelectedTipos] = useState<string[]>([]);
   const [selectedCaminos, setSelectedCaminos] = useState<string[]>([]);
   const [calificacionRange, setCalificacionRange] = useState<[number, number]>([1, 5]);
-  const [opinionesRange, setOpinionesRange] = useState<[number, number]>([0, 2600]);
+  const [opinionesRange, setOpinionesRange] = useState<[number, number]>([0, 6637]);
 
   const [viewFormat, setViewFormat] = useState<"tabla" | "cards">("tabla");
 
@@ -102,7 +102,7 @@ function App() {
         (califNum >= calificacionRange[0] &&
           califNum <= calificacionRange[1]);
 
-      // Opiniones (0–2600)
+      // Opiniones (0–6637)
       const opinNum = Number.isFinite(r?.opiniones_num)
         ? Number(r.opiniones_num)
         : parseOpiniones(r?.num_opiniones);

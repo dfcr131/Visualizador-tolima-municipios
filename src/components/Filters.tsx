@@ -20,7 +20,7 @@ interface FiltersProps {
   calificacionRange: [number, number];
   onCalificacionRangeChange: (range: [number, number]) => void;
 
-  // Rango opiniones (fijo 0-2600)
+  // Rango opiniones (fijo 0-6637)
   opinionesRange: [number, number];
   onOpinionesRangeChange: (range: [number, number]) => void;
 }
@@ -253,14 +253,14 @@ export function Filters({
     calificacionRange[0] !== 1 ||
     calificacionRange[1] !== 5 ||
     opinionesRange[0] !== 0 ||
-    opinionesRange[1] !== 2600;
+    opinionesRange[1] !== 6637;
 
   const clearAll = () => {
     onSearchChange("");
     onTiposChange([]);
     onCaminosChange([]);
     onCalificacionRangeChange([1, 5]);
-    onOpinionesRangeChange([0, 2600]);
+    onOpinionesRangeChange([0, 6637]);
   };
 
   return (
@@ -324,9 +324,9 @@ export function Filters({
           {/* Opiniones */}
           <div className="bg-white/90 rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
             <RangeSelector
-              label="Opiniones (0–2600)"
+              label="Opiniones (0–6637)"
               min={0}
-              max={2600}
+              max={6637}
               step={1}
               value={opinionesRange}
               onChange={onOpinionesRangeChange}
