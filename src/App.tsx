@@ -22,7 +22,7 @@ function App() {
   const [calificacionRange, setCalificacionRange] = useState<[number, number]>([1, 5]);
   const [opinionesRange, setOpinionesRange] = useState<[number, number]>([0, 6637]);
 
-  const [viewFormat, setViewFormat] = useState<"tabla" | "cards">("tabla");
+  const [viewFormat, setViewFormat] = useState<"tabla" | "cards">("cards");
 
   // Cargar datos XLSX
   useEffect(() => {
@@ -267,18 +267,6 @@ const handleDownloadCSV = (all: boolean = false) => {
             {/* Controles de vista */}
             <div className="flex items-center gap-2">
               <button
-                onClick={() => setViewFormat("tabla")}
-                className={`flex items-center gap-2 px-5 py-2 rounded-xl font-medium transition-all ${
-                  viewFormat === "tabla"
-                    ? "bg-emerald-500 text-white shadow-md"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                }`}
-              >
-                <Table className="w-4 h-4" />
-                Ver como Tabla
-              </button>
-
-              <button
                 onClick={() => setViewFormat("cards")}
                 className={`flex items-center gap-2 px-5 py-2 rounded-xl font-medium transition-all ${
                   viewFormat === "cards"
@@ -288,6 +276,17 @@ const handleDownloadCSV = (all: boolean = false) => {
               >
                 <Type className="w-4 h-4" />
                 Ver como Cards
+              </button>
+              <button
+                onClick={() => setViewFormat("tabla")}
+                className={`flex items-center gap-2 px-5 py-2 rounded-xl font-medium transition-all ${
+                  viewFormat === "tabla"
+                    ? "bg-emerald-500 text-white shadow-md"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                }`}
+              >
+                <Table className="w-4 h-4" />
+                Ver como Tabla
               </button>
             </div>
 
