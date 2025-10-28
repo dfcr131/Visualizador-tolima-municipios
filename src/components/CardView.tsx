@@ -187,7 +187,7 @@ export function CardView({ data }: { data: RegistroTuristicoPontevedra[] }) {
                   {car.length > 3 && ` +${car.length - 3}`}
                 </div>
                 <div>
-                  <strong>Según su calificación: </strong>
+                  <strong>Frecuencia estandarizada de opinión: </strong>
                   {registro.calificacionCualitativa || "—"}
                 </div>
               </div>
@@ -210,4 +210,3 @@ export function CardView({ data }: { data: RegistroTuristicoPontevedra[] }) {
     </div>
   );
 }
-
