@@ -186,6 +186,10 @@ export function CardView({ data }: { data: RegistroTuristicoPontevedra[] }) {
                   {car.length === 0 ? "—" : car.slice(0, 3).join(", ")}
                   {car.length > 3 && ` +${car.length - 3}`}
                 </div>
+                <div>
+                  <strong>Según su calificación: </strong>
+                  {registro.calificacionCualitativa || "—"}
+                </div>
               </div>
 
               {/* Calificación y opiniones */}

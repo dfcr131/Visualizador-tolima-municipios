@@ -69,11 +69,12 @@ export function DataTable({ data }: DataTableProps) {
             <table className="w-full border-collapse bg-white/95 backdrop-blur-sm table-auto">
               <thead>
                 <tr className="bg-emerald-600 text-white text-sm">
-                  <th className="px-4 py-3 text-left font-semibold whitespace-nowrap w-[12%]">Nombre</th>
-                  <th className="px-4 py-3 text-left font-semibold whitespace-nowrap w-[20%]">Descripción</th>
+                  <th className="px-4 py-3 text-left font-semibold whitespace-nowrap w-[10%]">Nombre</th>
+                  <th className="px-4 py-3 text-left font-semibold whitespace-nowrap w-[15%]">Descripción</th>
                   <th className="px-4 py-3 text-left font-semibold whitespace-nowrap w-[12%]">Caminos</th>
-                  <th className="px-4 py-3 text-left font-semibold whitespace-nowrap w-[14%]">Características</th>
+                  <th className="px-4 py-3 text-left font-semibold whitespace-nowrap w-[12%]">Características</th>
                   <th className="px-4 py-3 text-left font-semibold whitespace-nowrap w-[7%]">Calificación</th>
+                  <th className="px-4 py-3 text-left font-semibold whitespace-nowrap w-[9%]">Calificación Cualitativa</th>
                   <th className="px-4 py-3 text-left font-semibold whitespace-nowrap w-[7%]">Opiniones</th>
                   <th className="px-4 py-3 text-left font-semibold whitespace-nowrap w-[10%]">Conectividad</th>
                   <th className="px-4 py-3 text-left font-semibold whitespace-nowrap w-[12%]">Redes</th>
@@ -170,10 +171,17 @@ export function DataTable({ data }: DataTableProps) {
                         {Number.isFinite(califNum) ? califNum.toFixed(1) : "—"}
                       </td>
 
+                      {/* calificacion Cualitativa */}
+                      <td className="px-4 py-3 text-sm text-gray-700">
+                         {r.calificacionCualitativa || "—"}
+                      </td>
+                      
                       {/* Opiniones */}
                       <td className="px-4 py-3 text-sm text-gray-700">
                         {Number.isFinite(opinNum) ? Math.round(opinNum) : "—"}
                       </td>
+
+                      
 
                       {/* Conectividad */}
                       <td className="px-4 py-3 text-sm text-gray-900">

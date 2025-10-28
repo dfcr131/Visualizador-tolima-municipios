@@ -17,7 +17,8 @@ export interface RegistroTuristicoPontevedra {
   descripcion: string;
   caracteristicas: string;
   num_opiniones: string | number;        // crudo
-  calificacion: string | number;         // crudo
+  calificacion: string | number; 
+  calificacionCualitativa: string;        // crudo
   srcset: string;                        // crudo
   Latitud: number;
   Longitud: number;
@@ -105,6 +106,7 @@ const rawData = XLSX.utils.sheet_to_json<any>(worksheet, { defval: "", raw: true
     const caracteristicas = toStringSafe(row["caracteristicas"]);
     const numOpinionesRaw = row["num_opiniones"];
     const calificacionRaw = row["calificacion"];
+    const calificacionCualitativa = toStringSafe(row["calificacion cualitativa"]);
     const srcset = toStringSafe(row["srcset"]);
 
     // tolera encabezados "Latitu"/"Latitud" y "Longitu"/"Longitud"
@@ -136,6 +138,8 @@ const rawData = XLSX.utils.sheet_to_json<any>(worksheet, { defval: "", raw: true
       caracteristicas,
       num_opiniones: typeof numOpinionesRaw === "number" ? numOpinionesRaw : toStringSafe(numOpinionesRaw),
       calificacion: typeof calificacionRaw === "number" ? calificacionRaw : toStringSafe(calificacionRaw),
+
+      calificacionCualitativa: calificacionCualitativa,
       srcset,
       Latitud: lat,
       Longitud: lon,
