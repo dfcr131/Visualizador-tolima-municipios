@@ -1,5 +1,16 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  LabelList,
+  Cell,
+} from "recharts";
 
 interface CommentsViewProps {
   data: any[];
@@ -74,18 +85,47 @@ export function CommentsView({ data }: CommentsViewProps) {
         </div>
       </div>
 
-      {/* 🔹 Mapa de burbujas (Top 5 categorías) */}
-      <div className="relative mb-12 bg-gradient-to-b from-emerald-50 to-white p-6 rounded-2xl border border-gray-200 shadow-inner overflow-hidden">
-        <h3 className="text-lg font-semibold text-center text-gray-700 mb-6">
-          Mapa de burbujas de categorías (Top 5)
-        </h3>
+      {/* 🔹 Gráfico de barras con nombres debajo de cada barra */}
+<div className="relative mb-12 bg-gradient-to-b from-emerald-50 to-white p-6 rounded-2xl border border-gray-200 shadow-inner overflow-hidden">
+  <h3 className="text-lg font-semibold text-center text-gray-700 mb-6">
+    Distribución de categorías (Top 5)
+  </h3>
 
-        <div className="flex flex-wrap justify-center items-center gap-8 min-h-[250px] relative">
+  <div className="w-full h-[360px]">
+    <ResponsiveContainer width="100%" height="100%">
+      <BarChart
+        data={frecuencia.map((f) => ({
+          categoria: f.cat,
+          porcentaje: ((f.count / frecuencia.reduce((a, b) => a + b.count, 0)) * 100).toFixed(1),
+          count: f.count,
+        }))}
+        margin={{ top: 20, right: 20, left: 20, bottom: 60 }}
+      >
+        <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+        <XAxis hide /> {/* Ocultamos el eje X porque pondremos etiquetas personalizadas */}
+        <YAxis
+          tick={{ fill: "#374151", fontSize: 12 }}
+          label={{
+            value: "Porcentaje (%)",
+            angle: -90,
+            position: "insideLeft",
+            fill: "#4b5563",
+            fontSize: 13,
+          }}
+        />
+        <Tooltip
+          cursor={{ fill: "rgba(0,0,0,0.05)" }}
+          contentStyle={{
+            backgroundColor: "#fff",
+            borderRadius: "8px",
+            border: "1px solid #e5e7eb",
+          }}
+          formatter={(value: any) => [`${value}%`, "Porcentaje"]}
+        />
+
+        {/* 🔹 Colores pastel personalizados */}
+        <Bar dataKey="porcentaje" radius={[8, 8, 0, 0]} barSize={60}>
           {frecuencia.map((f, i) => {
-            // 🔹 Tamaño más equilibrado (con límites)
-            const size = Math.min(180, Math.max(70, f.count * 2.2));
-
-            // 🔹 Paleta pastel más variada
             const colors = [
               "#A7F3D0", // verde menta
               "#FDE68A", // amarillo pastel
@@ -93,31 +133,32 @@ export function CommentsView({ data }: CommentsViewProps) {
               "#FBCFE8", // rosado
               "#BAE6FD", // azul cielo
             ];
-
-            return (
-              <motion.div
-                key={f.cat}
-                className="flex items-center justify-center text-center font-semibold shadow-md cursor-pointer rounded-full text-gray-800"
-                style={{
-                  width: `${size}px`,
-                  height: `${size}px`,
-                  backgroundColor: colors[i % colors.length],
-                }}
-                whileHover={{
-                  scale: 1.1,
-                  boxShadow: "0 0 12px rgba(0,0,0,0.15)",
-                }}
-                transition={{ type: "spring", stiffness: 200, damping: 10 }}
-              >
-                <div className="px-3">
-                  <p className="text-sm font-semibold">{f.cat}</p>
-                  <p className="text-xs opacity-70">{f.count} comentarios</p>
-                </div>
-              </motion.div>
-            );
+            return <Cell key={`cell-${i}`} fill={colors[i % colors.length]} />;
           })}
-        </div>
-      </div>
+          {/* 🔹 Etiqueta de porcentaje arriba */}
+          <LabelList
+            dataKey="porcentaje"
+            position="top"
+            formatter={(v: any) => `${v}%`}
+            style={{ fill: "#374151", fontWeight: 600 }}
+          />
+          {/* 🔹 Etiqueta de categoría debajo */}
+          <LabelList
+            dataKey="categoria"
+            position="insideBottom"
+            dy={40}
+            style={{
+              fill: "#374151",
+              fontSize: 12,
+              fontWeight: 500,
+              textAnchor: "middle",
+            }}
+          />
+        </Bar>
+      </BarChart>
+    </ResponsiveContainer>
+  </div>
+</div>
 
       {/* 🔹 Tabla de comentarios */}
       <div className="overflow-x-auto mb-12 rounded-xl border border-gray-200 shadow-sm">
