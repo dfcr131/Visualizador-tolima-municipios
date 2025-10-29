@@ -116,6 +116,14 @@ const rawData = XLSX.utils.sheet_to_json<any>(worksheet, { defval: "", raw: true
     const facebook = toStringSafe(row["facebook_urls"]);
     const instagram = toStringSafe(row["instagram_urls"]);
 
+    const comentarios1 = toStringSafe(row["Comentarios 1"]);
+    const comentarios2 = toStringSafe(row["Comentarios 2"]);
+    const comentarios3 = toStringSafe(row["Comentarios 3"]);
+    const comentarios4 = toStringSafe(row["Comentarios 4"]);
+    const comentarios5 = toStringSafe(row["Comentarios 5"]);
+
+    const categComentario = toStringSafe(row["Categoría_comentario"]);
+
     // derivados
     const opinionesNum = parseOpiniones(numOpinionesRaw) ?? undefined;
     const calificacionNum = parseCalificacion(calificacionRaw) ?? undefined;
@@ -145,6 +153,13 @@ const rawData = XLSX.utils.sheet_to_json<any>(worksheet, { defval: "", raw: true
       Longitud: lon,
       facebook_urls: facebook,
       instagram_urls: instagram,
+      comentarios_1: comentarios1,
+      comentarios_2: comentarios2,
+      comentarios_3: comentarios3,
+      comentarios_4: comentarios4,
+      comentarios5: comentarios5,
+
+      categ_Comentario:categComentario,
 
       opiniones_num: opinionesNum,
       calificacion_num: calificacionNum,
