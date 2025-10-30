@@ -147,7 +147,7 @@ export function CommentsView({ data }: CommentsViewProps) {
                     border: "1px solid #e5e7eb",
                     boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
                   }}
-                  formatter={(value: any, name: string, props: any) => {
+                  formatter={(value: any, props: any) => {
                     const count = props?.payload?.count || 0;
                     return [
                       <>

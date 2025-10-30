@@ -8,7 +8,7 @@ export function Navbar() {
           <div className="flex items-center gap-3">
             <Mountain className="w-7 h-7 text-emerald-600" />
             <h1 className="text-2xl font-semibold text-gray-800">
-              Observatorio Turístico de Pontevedra
+              Página web Pontevedra (Web Scraping y Análisis de Redes Sociales)
             </h1>
           </div>
         </div>

@@ -154,12 +154,29 @@ function RangeSelector({
     onChange(next);
   };
 
+  // Cálculo del rango activo (posición izquierda y ancho)
+  const leftPercent = ((local[0] - min) / (max - min)) * 100;
+  const rightPercent = ((local[1] - min) / (max - min)) * 100;
+  const widthPercent = rightPercent - leftPercent;
+
   return (
     <div>
       <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
+
       <div className="flex items-center gap-3 mb-2">
         <span className="text-xs text-gray-500">{format(local[0])}</span>
-        <div className="flex-1 h-2 bg-gray-200 rounded-full relative">
+
+        <div className="relative flex-1 h-2 rounded-full bg-gray-200">
+          {/* Barra activa corregida */}
+          <div
+            className="absolute h-2 bg-emerald-400 rounded-full"
+            style={{
+              left: `${leftPercent}%`,
+              width: `${widthPercent}%`,
+            }}
+          />
+
+          {/* Sliders */}
           <input
             type="range"
             min={min}
@@ -178,16 +195,12 @@ function RangeSelector({
             onChange={(e) => handleMax(parseFloat(e.target.value))}
             className="absolute w-full h-2 appearance-none bg-transparent pointer-events-auto"
           />
-          <div
-            className="absolute h-2 bg-emerald-300 rounded-full"
-            style={{
-              left: `${((local[0] - min) / (max - min)) * 100}%`,
-              right: `${(1 - (local[1] - min) / (max - min)) * 100}%`,
-            }}
-          />
         </div>
+
         <span className="text-xs text-gray-500">{format(local[1])}</span>
       </div>
+
+      {/* Entradas numéricas */}
       <div className="grid grid-cols-2 gap-2">
         <input
           type="number"
