@@ -143,11 +143,25 @@ export function CommentsView({ data }: CommentsViewProps) {
                   cursor={{ fill: "rgba(0,0,0,0.05)" }}
                   contentStyle={{
                     backgroundColor: "#fff",
-                    borderRadius: "8px",
+                    borderRadius: "10px",
                     border: "1px solid #e5e7eb",
+                    boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
                   }}
-                  formatter={(value: any) => [`${value}%`, "Porcentaje"]}
+                  formatter={(value: any, name: string, props: any) => {
+                    const count = props?.payload?.count || 0;
+                    return [
+                      <>
+                        <span style={{ fontWeight: 600, color: "#059669" }}>
+                          {count} comentarios
+                        </span>
+                        <br />
+                        <span style={{ color: "#374151" }}>Porcentaje: {value}%</span>
+                      </>,
+                    ];
+                  }}
+                  labelFormatter={(label) => `${label}`}
                 />
+
                 <Bar dataKey="porcentaje" radius={[8, 8, 0, 0]} barSize={60}>
                   {frecuencia.map((_, i) => {
                     const colors = ["#A7F3D0", "#FDE68A", "#C7D2FE", "#FBCFE8", "#BAE6FD"];
